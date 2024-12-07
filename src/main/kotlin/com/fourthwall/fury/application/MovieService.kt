@@ -10,12 +10,12 @@ import org.springframework.stereotype.Service
 class MovieService(private val movieRepository: MovieRepository, private val imdbValidator: ImdbValidator) {
     fun findAll(): Collection<MovieDTO> = movieRepository.findAll().map { MovieDTO.from(it) }
 
-    fun findBy(imdbID : String): Either<ImdbError, MovieDTO> =
+    fun findBy(imdbID : String): Either<OmdbError, MovieDTO> =
         imdbValidator.validate(imdbID)
             .map { movieRepository.findBy(it) }
             .flatMap {
                 when (it) {
-                    null -> Either.Left(MovieInsufficientlyFurious)
+                    null -> Either.Left(OmdbNoResponseError)
                     else -> Either.Right(it)
                 }
             }

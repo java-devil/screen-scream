@@ -1,8 +1,7 @@
 package com.fourthwall.fury.presentation
 
-import com.fourthwall.fury.application.ImdbValidationError
-import com.fourthwall.fury.application.MovieInsufficientlyFurious
-import com.fourthwall.fury.application.MovieService
+import com.fourthwall.fury.application.*
+import org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController
 class MovieController(private val movieService: MovieService) {
 
     @GetMapping("/", "")
-    @Suppress("unused")
     fun findAll(): ResponseEntity<*> = ResponseEntity.ok(movieService.findAll())
 
     @GetMapping("/{imdbID}")
@@ -24,8 +22,9 @@ class MovieController(private val movieService: MovieService) {
             .map { ResponseEntity.ok(it) }
             .mapLeft {
                 when (it) {
-                    is ImdbValidationError -> ResponseEntity.unprocessableEntity().body(it)
                     is MovieInsufficientlyFurious -> ResponseEntity.notFound().build()
+                    is ValidationError -> ResponseEntity.unprocessableEntity().body(it)
+                    is OmdbNoResponseError -> ResponseEntity.status(SERVICE_UNAVAILABLE).body(it)
                 }
             }
             .fold({ it }, { it })

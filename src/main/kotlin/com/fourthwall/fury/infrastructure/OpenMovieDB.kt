@@ -15,17 +15,10 @@ class OpenMovieDB(private val omdbClient: RestClient, private val appConfig: App
 
     private val logger: Logger = LoggerFactory.getLogger(OpenMovieDB::class.java)
 
-    private val furiousMovies: Map<ImdbID, Movie?> = listOf(
-        ImdbID("tt0232500"),
-        ImdbID("tt0322259"),
-        ImdbID("tt0463985"),
-        ImdbID("tt1013752"),
-        ImdbID("tt1596343"),
-        ImdbID("tt1905041"),
-        ImdbID("tt2820852"),
-        ImdbID("tt4630562"),
-        ImdbID("tt5433138"),
-    ).associateWith { lookUp(it) }
+    private val furiousMovies: Map<ImdbID, Movie?> = appConfig
+        .furiousMovies
+        .map { ImdbID(it) }
+        .associateWith { lookUp(it) }
 
     override fun findAll(): Collection<Movie> = furiousMovies.values.filterNotNull()
 

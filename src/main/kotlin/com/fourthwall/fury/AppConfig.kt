@@ -10,6 +10,7 @@ import org.springframework.web.client.RestClient
 class AppConfig {
 
     lateinit var omdbApiKey: String
+    lateinit var furiousMovies: List<String>
 
     @Bean
     @Suppress("unused")

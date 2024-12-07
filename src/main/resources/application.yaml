@@ -3,3 +3,13 @@ spring:
     name: ScreenScream
 app:
   omdbApiKey: ${OMDB_API_KEY}
+  furiousMovies:
+    - tt0232500
+    - tt0322259
+    - tt0463985
+    - tt1013752
+    - tt1596343
+    - tt1905041
+    - tt2820852
+    - tt4630562
+    - tt5433138
