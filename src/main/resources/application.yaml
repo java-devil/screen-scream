@@ -1,3 +1,5 @@
 spring:
   application:
     name: ScreenScream
+app:
+  omdbApiKey: ${OMDB_API_KEY}
