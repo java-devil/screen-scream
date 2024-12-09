@@ -6,9 +6,11 @@ import arrow.core.raise.either
 import com.fourthwall.fury.core.ReviewBook
 import com.fourthwall.fury.presentation.UserReviewDTO
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
 
 @Service
+@Transactional
 class MovieReviewer(
     private val reviewBook: ReviewBook,
     private val imdbValidator: ImdbValidator,
