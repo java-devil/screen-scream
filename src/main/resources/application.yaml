@@ -1,6 +1,10 @@
 spring:
   application:
     name: ScreenScream
+  datasource:
+    url: jdbc:postgresql://db:5432/screen-scream
+    username: thisisnotaproductionusername
+    password: thisisnotaproductionpassword
 app:
   omdbApiKey: ${OMDB_API_KEY}
   furiousMovies:
