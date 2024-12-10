@@ -7,10 +7,18 @@ plugins {
 	id("nu.studer.jooq") version "9.0"
 	id("org.springframework.boot") version "3.4.0"
 	id("io.spring.dependency-management") version "1.1.6"
+	id("com.avast.gradle.docker-compose") version "0.17.11"
+	id("com.google.cloud.tools.jib") version "3.4.4"
 }
 
 group = "com.fourthwall"
 version = "0.0.1-SNAPSHOT"
+
+jib {
+	to {
+		image = "screen-scream:0.0.1"
+	}
+}
 
 java {
 	toolchain {
@@ -27,6 +35,7 @@ dependencies {
 	implementation("io.arrow-kt:arrow-fx-coroutines:1.2.4")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-jooq")
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.postgresql:postgresql:42.7.4")

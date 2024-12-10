@@ -1,0 +1,25 @@
+services:
+  app:
+    image: screen-scream:0.0.1
+    container_name: screen_scream
+    ports:
+      - "8080:8080"
+    environment:
+      OMDB_API_KEY: ${OMDB_API_KEY}
+    depends_on:
+      - db
+
+  db:
+    image: postgres:17-alpine
+    container_name: postgres
+    environment:
+      POSTGRES_DB: screen-scream
+      POSTGRES_USER: thisisnotaproductionusername
+      POSTGRES_PASSWORD: thisisnotaproductionpassword
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  db_data:
