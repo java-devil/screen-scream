@@ -1,10 +1,29 @@
 package com.fourthwall.fury.presentation
 
 import com.fourthwall.fury.core.BookedScreening
+import io.swagger.v3.oas.annotations.media.Schema
 import java.time.LocalDateTime
 import java.util.UUID
 
-data class BookedScreeningDTO(val booking: UUID, val imdbID: String, val price: String, val showTime: LocalDateTime) {
+data class BookedScreeningDTO(
+    @field:Schema(example = "00000000-0000-0000-0000-000000000000")
+    val booking: UUID,
+
+    @field:Schema(example = "tt0232500", pattern = """^[a-zA-Z]{2}\d{7}$""")
+    val imdbID: String,
+
+    @field:Schema(
+        description = "Precise money representation, from 0.01 to 99.99 in increments of 0.01",
+        minimum = "0.01",
+        maximum = "99.99",
+        example = "64.0",
+        pattern = """^\d{1,2}\.\d{2}$""",
+    )
+    val price: String,
+
+    @field:Schema(example = "2025-01-01T00:00:00.000Z")
+    val showTime: LocalDateTime,
+) {
     companion object {
         fun from(bookedScreening: BookedScreening): BookedScreeningDTO =
             BookedScreeningDTO(
