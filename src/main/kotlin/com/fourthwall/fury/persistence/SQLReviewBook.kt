@@ -5,7 +5,6 @@ import com.fourthwall.fury.core.ReviewBook
 import com.fourthwall.fury.core.UserName
 import com.fourthwall.fury.core.UserScore
 import nu.studer.sample.tables.MovieReviews.MOVIE_REVIEWS
-import nu.studer.sample.tables.records.MovieReviewsRecord
 import org.jooq.DSLContext
 import org.jooq.impl.DSL
 import org.springframework.context.annotation.Primary
@@ -35,7 +34,9 @@ class SQLReviewBook(private val db: DSLContext) : ReviewBook {
 
     override fun upsert(imdbID: ImdbID, user: UserName, score: UserScore) {
         db.insertInto(MOVIE_REVIEWS)
-            .set(MovieReviewsRecord(imdbID.value, user.value, score.value))
+            .set(MOVIE_REVIEWS.IMDB_ID, imdbID.value)
+            .set(MOVIE_REVIEWS.USER_NAME, user.value)
+            .set(MOVIE_REVIEWS.USER_SCORE, score.value)
             .onDuplicateKeyUpdate()
             .set(MOVIE_REVIEWS.USER_SCORE, score.value)
             .execute()

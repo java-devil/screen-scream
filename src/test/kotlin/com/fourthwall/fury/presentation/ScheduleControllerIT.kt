@@ -1,15 +1,22 @@
 package com.fourthwall.fury.presentation
 
 import com.fourthwall.fury.core.*
+import nu.studer.sample.Tables.MOVIE_SCHEDULE
+import org.jooq.DSLContext
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.core.ParameterizedTypeReference
+import org.springframework.test.context.DynamicPropertyRegistry
+import org.springframework.test.context.DynamicPropertySource
 import org.springframework.web.client.RestClient
+import org.testcontainers.containers.PostgreSQLContainer
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.util.UUID
@@ -17,7 +24,7 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class ScheduleControllerIT @Autowired constructor(val movieSchedule: MovieSchedule) {
+class ScheduleControllerIT @Autowired constructor(val db: DSLContext, val movieSchedule: MovieSchedule) {
 
     @LocalServerPort
     private var port: Int = 0
@@ -31,11 +38,28 @@ class ScheduleControllerIT @Autowired constructor(val movieSchedule: MovieSchedu
     private val showTimeB = LocalDateTime.of(2025, 1, 1, 18, 0)
     private val showTimeC = LocalDateTime.of(2025, 1, 1, 21, 0)
 
+    companion object {
+        @JvmStatic
+        private val dockerizedDB = PostgreSQLContainer("postgres:17-alpine")
+
+        @JvmStatic @BeforeAll
+        fun beforeAll() { dockerizedDB.start() }
+
+        @JvmStatic @AfterAll
+        fun afterAll() { dockerizedDB.stop() }
+
+        @JvmStatic @DynamicPropertySource
+        @Suppress("unused")
+        fun configureProperties(registry: DynamicPropertyRegistry) {
+            registry.add("spring.datasource.url", dockerizedDB::getJdbcUrl)
+            registry.add("spring.datasource.username", dockerizedDB::getUsername)
+            registry.add("spring.datasource.password", dockerizedDB::getPassword)
+        }
+    }
+
     @BeforeEach
     fun before() {
-        movieSchedule.findAll()
-            .forEach { movieSchedule.free(it.booking) }
-
+        db.deleteFrom(MOVIE_SCHEDULE).execute()
         movieSchedule.book(Screening(ImdbID(movieA), priceA, showTimeA))
         movieSchedule.book(Screening(ImdbID(movieB), priceA, showTimeB))
         movieSchedule.book(Screening(ImdbID(movieB), priceA, showTimeC))

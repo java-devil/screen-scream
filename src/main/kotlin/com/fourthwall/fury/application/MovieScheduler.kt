@@ -7,9 +7,11 @@ import com.fourthwall.fury.core.Screening
 import com.fourthwall.fury.presentation.BookedScreeningDTO
 import com.fourthwall.fury.presentation.ScreeningDTO
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
 
 @Service
+@Transactional
 class MovieScheduler(
     private val movieSchedule: MovieSchedule,
     private val imdbValidator: ImdbValidator,
