@@ -1,26 +1,24 @@
 package com.fourthwall.fury.presentation
 
+import com.fourthwall.fury.PersistenceConfiguration
 import com.fourthwall.fury.core.ImdbID
 import com.fourthwall.fury.core.ReviewBook
 import com.fourthwall.fury.core.UserName
 import com.fourthwall.fury.core.UserScore
 import nu.studer.sample.tables.MovieReviews.MOVIE_REVIEWS
 import org.jooq.DSLContext
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
+import org.springframework.context.annotation.Import
 import org.springframework.http.HttpStatus
-import org.springframework.test.context.DynamicPropertyRegistry
-import org.springframework.test.context.DynamicPropertySource
 import org.springframework.web.client.RestClient
-import org.testcontainers.containers.PostgreSQLContainer
 import java.math.BigDecimal
 import kotlin.test.assertEquals
 
+@Import(PersistenceConfiguration::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class ReviewControllerIT @Autowired constructor(val db: DSLContext, val reviewBook: ReviewBook) {
 
@@ -28,24 +26,6 @@ class ReviewControllerIT @Autowired constructor(val db: DSLContext, val reviewBo
     private var port: Int = 0
     private val webBrowser: RestClient = RestClient.builder()
         .defaultStatusHandler({ it.is4xxClientError }) { _, response -> println(response.body) }.build()
-
-    companion object {
-        @JvmStatic
-        private val dockerizedDB = PostgreSQLContainer("postgres:17-alpine")
-
-        @JvmStatic @BeforeAll
-        fun beforeAll() { dockerizedDB.start() }
-
-        @JvmStatic @AfterAll
-        fun afterAll() { dockerizedDB.stop() }
-
-        @JvmStatic @DynamicPropertySource @Suppress("unused")
-        fun configureProperties(registry: DynamicPropertyRegistry) {
-            registry.add("spring.datasource.url", dockerizedDB::getJdbcUrl)
-            registry.add("spring.datasource.username", dockerizedDB::getUsername)
-            registry.add("spring.datasource.password", dockerizedDB::getPassword)
-        }
-    }
 
     private val userA = "Wiesio"
     private val userB = "Miecio"
@@ -64,7 +44,7 @@ class ReviewControllerIT @Autowired constructor(val db: DSLContext, val reviewBo
     @Test
     fun `should respond to a valid reviewed FnF IMDB ID with a mean of all User Scores in precisely the form #,#`() {
         // GIVEN:
-        val url = "http://localhost:$port/api/v1/movies/$movieA/reviews/"
+        val url = "http://localhost:$port/api/v1/movies/$movieA/reviews"
 
         // WHEN:
         val response = webBrowser.get().uri(url).retrieve().toEntity(BigDecimal::class.java)
@@ -77,7 +57,7 @@ class ReviewControllerIT @Autowired constructor(val db: DSLContext, val reviewBo
     @Test
     fun `should respond to a valid unreviewed FnF IMDB ID with HTTP error code 404`() {
         // GIVEN:
-        val url = "http://localhost:$port/api/v1/movies/$movieB/reviews/"
+        val url = "http://localhost:$port/api/v1/movies/$movieB/reviews"
 
         // WHEN:
         val response = webBrowser.get().uri(url).retrieve().toEntity(BigDecimal::class.java)

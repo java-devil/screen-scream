@@ -1,13 +1,16 @@
 package com.fourthwall.fury.presentation
 
+import com.fourthwall.fury.PersistenceConfiguration
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
+import org.springframework.context.annotation.Import
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpStatus
 import org.springframework.web.client.RestClient
 import kotlin.test.assertEquals
 
+@Import(PersistenceConfiguration::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class MovieControllerIT {
 
